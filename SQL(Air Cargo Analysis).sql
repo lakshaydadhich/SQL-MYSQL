@@ -52,6 +52,8 @@ GRANT ALL PRIVILEGES ON project TO 'lakshaay1';
 /*.Write a query to find the maximum ticket price for each class using 
 window functions on the ticket_details table*/
 
+select class_id, price_per_ticket, max(price_per_ticket) 
+over (partition by class_id) As max_price from ticket_details;
 
 
 
@@ -90,6 +92,24 @@ passengers flying between a range of routes defined in run time. Also,
 return an error message if the table doesn't exist.*/
 
 
+CREATE PROCEDURE GetPassengers ( IN start_route_id INT,
+IN end_route_id INT
+) BEGIN
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+IF SQLSTATE = '42S02' THEN SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'Error: Table Passengers_on_flights does not exist'; ELSE
+RESIGNAL; END IF;
+END;
+SELECT
+aircraft_id, route_id, customer_id, depart, arrival, seat_num, class_id, travel_date, flight_num FROM
+Passengers_on_flights
+WHERE
+route_id BETWEEN start_route_id AND end_route_id;
+
+END
+
+CALL GetPassengers (1, 25);
 
 
 
